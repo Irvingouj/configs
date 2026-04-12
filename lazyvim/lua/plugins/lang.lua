@@ -1,11 +1,6 @@
-local function extend_unique(target, values)
-  target = target or {}
-  for _, value in ipairs(values) do
-    if not vim.tbl_contains(target, value) then
-      table.insert(target, value)
-    end
-  end
-  return target
+-- Conditional language support: only configure LSPs for installed toolchains
+local function has(cmd)
+  return vim.fn.executable(cmd) == 1
 end
 
 local function angular_probe_path()
@@ -16,8 +11,23 @@ local function angular_probe_path()
   return nil
 end
 
-return {
-  {
+local plugins = {}
+
+-- Rust: rust-analyzer via LazyVim extra
+if has("cargo") then
+  table.insert(plugins, { import = "lazyvim.plugins.extras.lang.rust" })
+end
+
+-- Go: gopls via LazyVim extra
+if has("go") then
+  table.insert(plugins, { import = "lazyvim.plugins.extras.lang.go" })
+end
+
+-- TypeScript / JavaScript + Angular LSP
+if has("node") then
+  table.insert(plugins, { import = "lazyvim.plugins.extras.lang.typescript" })
+
+  table.insert(plugins, {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
@@ -43,9 +53,12 @@ return {
         },
       },
     },
-  },
-  -- Roslyn LSP for C# (same engine as VS Code)
-  {
+  })
+end
+
+-- C# / .NET: Roslyn LSP
+if has("dotnet") then
+  table.insert(plugins, {
     "mason-org/mason.nvim",
     opts = {
       registries = {
@@ -53,29 +66,39 @@ return {
         "github:Crashdummyy/mason-registry",
       },
     },
-  },
-  {
+  })
+  table.insert(plugins, {
     "seblyng/roslyn.nvim",
     ft = "cs",
     ---@module 'roslyn.config'
     ---@type RoslynNvimConfig
     opts = {},
-  },
-  {
-    "nvim-treesitter/nvim-treesitter",
-    opts = function(_, opts)
-      opts.ensure_installed = extend_unique(opts.ensure_installed, {
-        "c_sharp",
-        "css",
-        "html",
-        "javascript",
-        "json",
-        "jsonc",
-        "rust",
-        "scss",
-        "tsx",
-        "typescript",
-      })
-    end,
-  },
-}
+  })
+end
+
+-- Treesitter: install parsers matching detected toolchains
+table.insert(plugins, {
+  "nvim-treesitter/nvim-treesitter",
+  opts = function(_, opts)
+    local parsers = {}
+    local toolchain_parsers = {
+      cargo = { "rust" },
+      go = { "go", "gomod", "gosum" },
+      node = { "javascript", "typescript", "tsx", "html", "css", "scss", "json", "jsonc" },
+      dotnet = { "c_sharp" },
+    }
+    for cmd, langs in pairs(toolchain_parsers) do
+      if has(cmd) then
+        vim.list_extend(parsers, langs)
+      end
+    end
+    opts.ensure_installed = opts.ensure_installed or {}
+    for _, p in ipairs(parsers) do
+      if not vim.tbl_contains(opts.ensure_installed, p) then
+        table.insert(opts.ensure_installed, p)
+      end
+    end
+  end,
+})
+
+return plugins
