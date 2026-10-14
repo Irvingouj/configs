@@ -1,0 +1,27 @@
+[general]
+import = ['C:\Users\jou\AppData\Roaming\alacritty\themes\current.toml']
+
+[terminal]
+shell = { program = 'C:\Program Files\nu\nu.exe' }
+
+[font]
+size = 10.0
+
+[font.normal]
+family = "JetBrainsMono NFM"
+style = "Regular"
+
+[font.bold]
+family = "JetBrainsMono NFM"
+style = "Bold"
+
+[font.italic]
+family = "JetBrainsMono NFM"
+style = "Italic"
+
+[font.bold_italic]
+family = "JetBrainsMono NFM"
+style = "Bold Italic"
+
+[window]
+padding = { x = 8, y = 8 }

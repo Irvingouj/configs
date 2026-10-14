@@ -5,6 +5,10 @@
 keybinds clear-defaults=true {
     locked {
         bind "Ctrl g" { SwitchToMode "normal"; }
+        bind "Alt left" { MoveFocusOrTab "left"; }
+        bind "Alt down" { MoveFocus "down"; }
+        bind "Alt up" { MoveFocus "up"; }
+        bind "Alt right" { MoveFocusOrTab "right"; }
     }
     pane {
         bind "left" { MoveFocus "left"; }
@@ -167,10 +171,7 @@ keybinds clear-defaults=true {
         bind "Ctrl q" { Quit; }
     }
     shared_except "locked" "move" {
-        bind "Ctrl h" { MoveFocusOrTab "left"; }
-        bind "Ctrl j" { MoveFocus "down"; }
-        bind "Ctrl k" { MoveFocus "up"; }
-        bind "Ctrl l" { MoveFocusOrTab "right"; }
+        bind "Ctrl h" { SwitchToMode "move"; }
     }
     shared_except "locked" "session" {
         bind "Ctrl o" { SwitchToMode "session"; }
@@ -291,6 +292,7 @@ plugins {
 // eg. "https://example.com/my-plugin.wasm"
 load_plugins {
     zellij:link
+    "file:C:\\Users\\jou\\AppData\\Roaming\\Zellij\\plugins\\zellij-agent-resume.wasm"
 }
 web_client {
     font "monospace"
@@ -314,7 +316,11 @@ web_client {
 // Default: default
 // 
 // theme "dracula"
- 
+theme_dark "solarized-dark"
+theme_light "solarized-light"
+// Alacritty never reports the OS light/dark mode, so follow-os-theme.nu rewrites this line
+explicit_theme_hue "light"
+
 // Choose the base input mode of zellij.
 // Default: normal
 // 
@@ -323,7 +329,7 @@ default_mode "normal"
 // Choose the path to the default shell that zellij will use for opening new panes
 // Default: $SHELL
 // 
-default_shell "C:\\Users\\jou\\AppData\\Local\\Programs\\nu\\bin\\nu.exe"
+default_shell "C:\\Program Files\\nu\\nu.exe"
  
 // Choose the path to override cwd that zellij will use for opening new panes
 // 
@@ -587,9 +593,7 @@ show_startup_tips false
 default_layout "default"
 pane_frames false
 simplified_ui false
-copy_on_select false
+copy_on_select true
 mouse_mode true
 scrollback_editor "nvim"
-
-
 
