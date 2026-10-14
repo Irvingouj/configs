@@ -1,5 +1,5 @@
 #!/usr/bin/env nu
-# Alacritty, Zellij and Claude Code can't follow the OS light/dark setting on their own,
+# Alacritty, Zellij, Claude Code and OpenCode don't reliably follow the OS light/dark setting,
 # so this polls it and rewrites the config each one live-reloads.
 
 const THEMES = path self themes
@@ -36,6 +36,10 @@ def claude-settings []: nothing -> path {
     $env.CLAUDE_CONFIG_DIR? | default ('~/.claude' | path expand) | path join settings.json
 }
 
+def opencode-cli []: nothing -> path {
+    $env.XDG_CONFIG_HOME? | default ('~/.config' | path expand) | path join opencode cli.json
+}
+
 def replace-line [file: path, pattern: string, replacement: string] {
     let text = (open --raw $file)
     if not ($text =~ $pattern) {
@@ -52,6 +56,8 @@ def apply [mode: string, zellij_kdl: path] {
     replace-line $zellij_kdl '(?m)^explicit_theme_hue "\w+"' $'explicit_theme_hue "($mode)"'
     # The ANSI themes draw with the terminal's palette, which is Solarized
     replace-line (claude-settings) '"theme":\s*"[^"]*"' $'"theme": "($mode)-ansi"'
+    # Only the theme mode is light/dark; `tabs.mode` is "off", so it never matches
+    replace-line (opencode-cli) '"mode":\s*"(light|dark)"' $'"mode": "($mode)"'
 }
 
 def main [] {

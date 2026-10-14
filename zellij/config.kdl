@@ -317,7 +317,7 @@ web_client {
 // 
 // theme "dracula"
 theme_dark "solarized-dark"
-theme_light "solarized-light"
+theme_light "solarized-light-paper"
 // Alacritty never reports the OS light/dark mode, so follow-os-theme.nu rewrites this line
 explicit_theme_hue "light"
 

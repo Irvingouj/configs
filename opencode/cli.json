@@ -1,0 +1,11 @@
+{
+  "$schema": "https://opencode.ai/v2/cli.json",
+  "theme": {
+    "name": "solarized",
+    "mode": "light"
+  },
+  "tabs": {
+    "mode": "off"
+  },
+  "plugins": ["./local-plugins/goal-mode-tui"]
+}
