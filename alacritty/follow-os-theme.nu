@@ -1,6 +1,6 @@
 #!/usr/bin/env nu
-# Alacritty and Zellij can't see the OS light/dark setting, so this polls it and
-# rewrites the two config lines they live-reload: the Alacritty theme and Zellij's hue.
+# Alacritty, Zellij and Claude Code can't follow the OS light/dark setting on their own,
+# so this polls it and rewrites the config each one live-reloads.
 
 const THEMES = path self themes
 
@@ -32,17 +32,26 @@ def zellij-config []: nothing -> path {
     | path join config.kdl
 }
 
+def claude-settings []: nothing -> path {
+    $env.CLAUDE_CONFIG_DIR? | default ('~/.claude' | path expand) | path join settings.json
+}
+
+def replace-line [file: path, pattern: string, replacement: string] {
+    let text = (open --raw $file)
+    if not ($text =~ $pattern) {
+        error make { msg: $"no line matching `($pattern)` in ($file)" }
+    }
+    let updated = ($text | str replace --regex $pattern $replacement)
+    if $updated != $text {
+        $updated | save --raw --force $file
+    }
+}
+
 def apply [mode: string, zellij_kdl: path] {
     cp ($THEMES | path join $"solarized_($mode).toml") ($THEMES | path join current.toml)
-
-    let kdl = (open --raw $zellij_kdl)
-    if not ($kdl =~ '(?m)^explicit_theme_hue ') {
-        error make { msg: $"no `explicit_theme_hue` line in ($zellij_kdl)" }
-    }
-    let updated = ($kdl | str replace --regex '(?m)^explicit_theme_hue "\w+"' $'explicit_theme_hue "($mode)"')
-    if $updated != $kdl {
-        $updated | save --raw --force $zellij_kdl
-    }
+    replace-line $zellij_kdl '(?m)^explicit_theme_hue "\w+"' $'explicit_theme_hue "($mode)"'
+    # The ANSI themes draw with the terminal's palette, which is Solarized
+    replace-line (claude-settings) '"theme":\s*"[^"]*"' $'"theme": "($mode)-ansi"'
 }
 
 def main [] {
