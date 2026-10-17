@@ -1,6 +1,6 @@
 # Zellij
 
-Windows config location:
+Windows config location. macOS users: see [`../zellij-macos/`](../zellij-macos/).
 
 ```powershell
 C:\Users\jou\AppData\Roaming\Zellij\config
