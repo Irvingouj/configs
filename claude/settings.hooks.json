@@ -1,0 +1,82 @@
+{
+  "statusLine": {
+    "type": "command",
+    "command": "python -I ~/.claude/hooks/statusline.py"
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -I ~/.claude/hooks/reply_in_chinese_reminder.py"
+          },
+          {
+            "type": "command",
+            "command": "python -I ~/.claude/hooks/zellij_attn.py off"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -I ~/.claude/hooks/reply_in_chinese_check.py"
+          },
+          {
+            "type": "command",
+            "command": "python -I ~/.claude/hooks/yes_no_answer_check.py"
+          },
+          {
+            "type": "command",
+            "command": "python -I ~/.claude/hooks/ask_gate_check.py"
+          },
+          {
+            "type": "command",
+            "command": "python -I ~/.claude/hooks/unconfirmed_claim_check.py",
+            "timeout": 30,
+            "statusMessage": "Checking for unconfirmed claims"
+          },
+          {
+            "type": "command",
+            "command": "python -I ~/.claude/hooks/zellij_attn.py on"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -I ~/.claude/hooks/zellij_attn.py on"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -I ~/.claude/hooks/decisions_after_compact.py"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -I ~/.claude/hooks/zellij_attn.py off",
+            "async": true
+          }
+        ]
+      }
+    ]
+  }
+}
